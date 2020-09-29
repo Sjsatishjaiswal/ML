@@ -1,44 +1,119 @@
 
     
-    ROC (Receiver Operating Characteristic) Curve
     
-A truly random classifier will have some correct
-predictions by the virtue of probability.
+                Hyperparameter Tuning
+                
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
 
-The ROC Curve is used to deduce the relationship between
-a truly random classifier and your algorithmic ML model.
+from sklearn.datasets import load_wine
+dataset = load_wine()
 
-The ROC Curve plots the 'true positive rate' (TPR)
-against the 'false positive rate' (FPR).
+X = dataset.data
+y = dataset.target
 
-True Positive Rate (TPR) is another name for Recall.
+from sklearn.neighbors import KNeighborsClassifier
+knn = KNeighborsClassifier()
 
-False Positive Rate (FPR) is the ratio of negative instances
-that are incorrectly classified as positive.
+from sklearn.model_selection import GridSearchCV
+params = {'n_neighbors' : [1, 2, 3, 4, 5, 6, 7]}
 
-FPR = 1 - TNR (True Negative Rate)
+grid = GridSearchCV(knn, params)
+grid.fit(X, y)
 
-True Negative Rate (TNR) is the ratio of negative 
-instances that are correctly classified as negative.
+best_knn = grid.best_estimator_
 
-In english,
+from sklearn.tree import DecisionTreeClassifier
+dtf = DecisionTreeClassifier()
 
-Recall = Sensitivity
-TNR = Specificity
+params = [{'criterion' : ['gini', 'entropy']},
+          {'max_depth' : [3, 5, 9]}]
 
-"ROC Curve plots sensitivity against 1 - specificity."
+grid = GridSearchCV(dtf, params)
+grid.fit(X, y)
 
-Sometimes it gets difficult to visualize outcome
-in the ROC Curve as two or more than two curves can 
-be very close to each other.
+best_tree = grid.best_estimator_
 
-To resolve this problem, we can computed a new trick
-known as AUC Score (Area Under the Curve) which 
-ranges between [0 to 1].
+#############################################################
 
-The higher the AUC Score, the better the model is.
+                    Ensemble Techniques
+                    
+Ensemble simply means a group. If we apply a group of ml
+algorithms together on the same dataset/problem, the practice
+is known as ensemble learning.
 
-"The AUC Score of a truly random classifier is 0.5"
+Ensemble technique can be applied in the following ways:
+    1. Stacking (ML)
+    2. Bagging (ML)
+    3. Boosting (DL)
+
+
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+
+from sklearn.datasets import load_breast_cancer
+dataset = load_breast_cancer()
+
+X = dataset.data
+y = dataset.target
+
+from sklearn.linear_model import LogisticRegression
+log_reg = LogisticRegression()
+
+from sklearn.neighbors import KNeighborsClassifier
+knn = KNeighborsClassifier()
+
+from sklearn.tree import DecisionTreeClassifier
+dtf = DecisionTreeClassifier()
+
+from sklearn.svm import SVC
+svm = SVC() 
+
+from sklearn.naive_bayes import GaussianNB
+nb = GaussianNB()
+
+from sklearn.ensemble import VotingClassifier
+vote = VotingClassifier([('LR', log_reg),
+                         ('KNN', knn),
+                         ('DT', dtf),
+                         ('SVM', svm),
+                         ('NB', nb)])
+
+vote.fit(X, y)
+vote.score(X, y)
+
+from sklearn.ensemble import BaggingClassifier
+bag = BaggingClassifier(nb, n_estimators = 8)
+
+bag.fit(X, y)
+bag.score(X, y)
+
+from sklearn.ensemble import RandomForestClassifier
+rf = RandomForestClassifier(n_estimators = 6)
+
+rf.fit(X, y)
+rf.score(X, y)
+
+
+Stacking                      |                   Bagging
+Different Algos               |   Different Implementation of same algo
+Same Dataset                  |   Shuffled subset of the dataset
+
+A special case of bagging technique where the base_estimator is a 
+Decision Tree is known as Random Forest Algorithm.
+
+
+
+
+
+
+
+
+
+
+
 
 
 
